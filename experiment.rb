@@ -3,14 +3,14 @@ require "minitest/autorun"
 require "pry"
 
 def gl
-  @gl ||= Logger.new(STDOUT)
+  @logger ||= Logger.new(STDOUT)
 end
 
 binding.pry if ENV["PRY"]
 
 class Experiment
   def ll
-    @ll ||= Logger.new(STDOUT)
+    @logger ||= Logger.new(STDOUT)
   end
 
   def start
@@ -24,18 +24,19 @@ console.start if ENV["PRY"]
 
 class ExperimentTest < Minitest::Test
   def test_gl
-    assert_equal gl, gl
+    assert_equal gl.object_id, gl.object_id
   end
 
   def test_console_gl
     console = Experiment.new
-    refute_equal gl, console.send(:gl)
-    assert_equal console.send(:gl), console.send(:gl)
+    refute_equal gl.object_id, console.send(:gl).object_id
+    assert_equal console.send(:gl).object_id, console.send(:gl).object_id
   end
 
   def test_console_ll
     console = Experiment.new
-    assert_equal console.ll, console.ll
-    refute_equal console.ll, console.send(:gl)
+    assert_equal console.ll.object_id, console.ll.object_id
+    assert_equal console.ll.object_id, console.send(:gl).object_id
+    refute_equal console.ll.object_id, gl.object_id
   end
 end
